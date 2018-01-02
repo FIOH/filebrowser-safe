@@ -136,12 +136,9 @@ def browse(request):
         if append:
             try:
                 # COUNTER/RESULTS
+                results_var['delete_total'] += 1
                 if fileobject.filetype == 'Image':
                     results_var['images_total'] += 1
-                if fileobject.filetype != 'Folder':
-                    results_var['delete_total'] += 1
-                elif fileobject.filetype == 'Folder' and fileobject.is_empty:
-                    results_var['delete_total'] += 1
                 if query.get('type') and query.get('type') in SELECT_FORMATS and fileobject.filetype in SELECT_FORMATS[query.get('type')]:
                     results_var['select_total'] += 1
                 elif not query.get('type'):
@@ -476,7 +473,8 @@ def rename(request):
                 (errno, strerror) = xxx_todo_changeme1.args
                 form.errors['name'] = forms.util.ErrorList([_('Error.')])
     else:
-        form = RenameForm(abs_path, file_extension)
+        file_basename = os.path.splitext(filename)[0]
+        form = RenameForm(abs_path, file_extension, initial={'name': file_basename})
 
     return render(request, 'filebrowser/rename.html', {
         'form': form,
